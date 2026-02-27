@@ -8,6 +8,7 @@ A simple Python REST API for collecting and querying sensor data.
 - GET `/devices` to list known device IDs
 - GET `/devices/{device_id}/values` to query readings for a device
   - support filtering by `start_ts`, `end_ts`, and `limit` via query parameters
+- GET `/health` returns a simple status JSON indicating the service is running
 
 ## Getting Started
 

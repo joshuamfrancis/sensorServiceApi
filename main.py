@@ -58,3 +58,9 @@ def get_device_values(device_id: str, start_ts: Optional[int] = None, end_ts: Op
             return []
         values = values[-l:]
     return values
+
+
+@app.get("/health")
+def health_check():
+    """Simple health endpoint. Returns 200 if service is running."""
+    return {"status": "ok"}

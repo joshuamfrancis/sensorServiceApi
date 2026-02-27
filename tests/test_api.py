@@ -72,3 +72,9 @@ def test_unauthorized():
         "altitude_m": 10.0
     }, headers={"x-client-secret": "wrong"})
     assert res.status_code == 401
+
+
+def test_health():
+    res = client.get("/health")
+    assert res.status_code == 200
+    assert res.json() == {"status": "ok"}
