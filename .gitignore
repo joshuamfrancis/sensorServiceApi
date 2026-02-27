@@ -27,6 +27,3 @@ Thumbs.db
 
 # logs
 *.log
-
-# github workflows caches
-**/.github/workflows/*
