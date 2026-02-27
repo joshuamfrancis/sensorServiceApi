@@ -1,0 +1,32 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# virtual environment
+.venv/
+
+# distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# test output
+.htmlcov
+.coverage
+.coverage.*
+
+# logs
+*.log
+
+# github workflows caches
+**/.github/workflows/*
