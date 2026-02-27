@@ -33,26 +33,32 @@ def test_post_and_get_device_list():
     assert res2.json() == ["dev1"]
 
 def test_get_values_filters_and_limit():
-    # insert multiple records
-    for ts in [100, 200, 300, 400]:
-        client.post("/sensors", json={
+    # insert multiple records and capture the server-generated timestamps
+    timestamps = []
+    for _ in range(4):
+        resp = client.post("/sensors", json={
             "device_id": "dev2",
-            "timestamp_ms": ts,
+            "timestamp_ms": 123,  # value will be ignored by server
             "temperature_c": 20.0,
             "temperature_f": 68.0,
             "humidity_pct": 50.0,
             "pressure_hpa": 1000.0,
             "altitude_m": 10.0
         }, headers={"x-client-secret": "mysecret"})
+        assert resp.status_code == 200
+        # grab the timestamp from storage directly
+        timestamps.append(storage["dev2"][-1].timestamp_ms)
+    # ensure we have increasing values
+    assert sorted(timestamps) == timestamps
     # retrieve all
     res_all = client.get("/devices/dev2/values")
     assert res_all.status_code == 200
     assert len(res_all.json()) == 4
-    # start_ts filter
-    res_start = client.get("/devices/dev2/values", params={"start_ts": 200})
+    # start_ts filter should return records >= second timestamp
+    res_start = client.get("/devices/dev2/values", params={"start_ts": timestamps[1]})
     assert len(res_start.json()) == 3
-    # end_ts filter
-    res_end = client.get("/devices/dev2/values", params={"end_ts": 300})
+    # end_ts filter should return records <= third timestamp
+    res_end = client.get("/devices/dev2/values", params={"end_ts": timestamps[2]})
     assert len(res_end.json()) == 3
     # limit
     res_lim = client.get("/devices/dev2/values", params={"limit": 2})

@@ -27,8 +27,11 @@ def post_sensor_data(data: SensorData, x_client_secret: Optional[str] = Header(N
     # Authentication placeholder: check x-client-secret
     if x_client_secret != "mysecret":
         raise HTTPException(status_code=401, detail="Unauthorized")
-    # pydantic v2: use model_dump instead of dict
+    # create record from payload but override timestamp with server time
     record = StoredSensorData(**data.model_dump())
+    # ignore any timestamp provided by client and use current UTC epoch milliseconds
+    now_ms = int(datetime.utcnow().timestamp() * 1000)
+    record.timestamp_ms = now_ms
     storage.setdefault(record.device_id, []).append(record)
     return {"id": record.id}
 
