@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 app = FastAPI()
 
@@ -60,7 +60,16 @@ def get_device_values(device_id: str, start_ts: Optional[int] = None, end_ts: Op
         if l <= 0:
             return []
         values = values[-l:]
-    return values
+    # convert records to dicts and append ISO datetime in AEST (+10h)
+    result = []
+    for v in values:
+        rec = v.model_dump()
+        # compute AEST datetime
+        dt_utc = datetime.fromtimestamp(v.timestamp_ms / 1000, tz=timezone.utc)
+        aest = dt_utc + timedelta(hours=10)
+        rec["timestamp_iso_aest"] = aest.isoformat()
+        result.append(rec)
+    return result
 
 
 @app.get("/health")

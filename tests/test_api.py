@@ -2,6 +2,7 @@ import sys
 import os
 import pytest
 from fastapi.testclient import TestClient
+from datetime import datetime
 
 # ensure project root is on path
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -53,13 +54,29 @@ def test_get_values_filters_and_limit():
     # retrieve all
     res_all = client.get("/devices/dev2/values")
     assert res_all.status_code == 200
-    assert len(res_all.json()) == 4
+    data_all = res_all.json()
+    assert len(data_all) == 4
+    # each record should include ISO AEST timestamp derived from timestamp_ms
+    for item in data_all:
+        assert "timestamp_iso_aest" in item
+        # verify conversion: parse back and check offset (rough check by splitting)
+        ts = item["timestamp_ms"]
+        iso = item["timestamp_iso_aest"]
+        # simple sanity: iso string starts with year and contains 'T'
+        assert iso.startswith(str(datetime.fromtimestamp(ts/1000).year))
+        assert "T" in iso
     # start_ts filter should return records >= second timestamp
     res_start = client.get("/devices/dev2/values", params={"start_ts": timestamps[1]})
-    assert len(res_start.json()) == 3
+    data_start = res_start.json()
+    assert len(data_start) == 3
+    for item in data_start:
+        assert "timestamp_iso_aest" in item
     # end_ts filter should return records <= third timestamp
     res_end = client.get("/devices/dev2/values", params={"end_ts": timestamps[2]})
-    assert len(res_end.json()) == 3
+    data_end = res_end.json()
+    assert len(data_end) == 3
+    for item in data_end:
+        assert "timestamp_iso_aest" in item
     # limit
     res_lim = client.get("/devices/dev2/values", params={"limit": 2})
     assert len(res_lim.json()) == 2
