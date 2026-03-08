@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Header
-from pydantic import BaseModel, Field
-from typing import Optional, List
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Optional
 from uuid import uuid4
 from datetime import datetime, timezone, timedelta
 
@@ -11,13 +11,10 @@ app = FastAPI()
 storage = {}
 
 class SensorData(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     device_id: str
     timestamp_ms: int
-    temperature_c: float
-    temperature_f: float
-    humidity_pct: float
-    pressure_hpa: float
-    altitude_m: float
 
 class StoredSensorData(SensorData):
     id: str = Field(default_factory=lambda: str(uuid4()))
@@ -30,9 +27,12 @@ def post_sensor_data(data: SensorData, x_client_secret: Optional[str] = Header(N
     # create record from payload but override timestamp with server time
     record = StoredSensorData(**data.model_dump())
     # ignore any timestamp provided by client and use current UTC epoch milliseconds
-    now_ms = int(datetime.utcnow().timestamp() * 1000)
+    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
     record.timestamp_ms = now_ms
-    storage.setdefault(record.device_id, []).append(record)
+    bucket = storage.setdefault(record.device_id, [])
+    bucket.append(record)
+    if len(bucket) > 100:
+        del bucket[:-100]
     return {"id": record.id}
 
 @app.get("/devices")
