@@ -21,7 +21,7 @@ services:
   sensor-service:
     image: jfrancis/sensor-service
     ports:
-      - "8001:8000"
+      - "8000:8000"
     environment:
       INFLUXDB_URL: http://influxdb:8086
       INFLUXDB_TOKEN: my-super-secret-token
