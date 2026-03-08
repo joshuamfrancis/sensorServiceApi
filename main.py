@@ -13,11 +13,11 @@ storage = {}
 class SensorData(BaseModel):
     device_id: str
     timestamp_ms: int
-    temperature_c: float
-    temperature_f: float
-    humidity_pct: float
-    pressure_hpa: float
-    altitude_m: float
+    temperature_c: Optional[float] = None
+    temperature_f: Optional[float] = None
+    humidity_pct: Optional[float] = None
+    pressure_hpa: Optional[float] = None
+    altitude_m: Optional[float] = None
 
 class StoredSensorData(SensorData):
     id: str = Field(default_factory=lambda: str(uuid4()))
@@ -30,7 +30,7 @@ def post_sensor_data(data: SensorData, x_client_secret: Optional[str] = Header(N
     # create record from payload but override timestamp with server time
     record = StoredSensorData(**data.model_dump())
     # ignore any timestamp provided by client and use current UTC epoch milliseconds
-    now_ms = int(datetime.utcnow().timestamp() * 1000)
+    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
     record.timestamp_ms = now_ms
     storage.setdefault(record.device_id, []).append(record)
     return {"id": record.id}
