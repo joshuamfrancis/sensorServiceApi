@@ -29,7 +29,10 @@ def post_sensor_data(data: SensorData, x_client_secret: Optional[str] = Header(N
     # ignore any timestamp provided by client and use current UTC epoch milliseconds
     now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
     record.timestamp_ms = now_ms
-    storage.setdefault(record.device_id, []).append(record)
+    bucket = storage.setdefault(record.device_id, [])
+    bucket.append(record)
+    if len(bucket) > 100:
+        del bucket[:-100]
     return {"id": record.id}
 
 @app.get("/devices")
