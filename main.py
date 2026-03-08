@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Header
-from pydantic import BaseModel, Field
-from typing import Optional, List
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Optional
 from uuid import uuid4
 from datetime import datetime, timezone, timedelta
 
@@ -11,13 +11,10 @@ app = FastAPI()
 storage = {}
 
 class SensorData(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     device_id: str
     timestamp_ms: int
-    temperature_c: Optional[float] = None
-    temperature_f: Optional[float] = None
-    humidity_pct: Optional[float] = None
-    pressure_hpa: Optional[float] = None
-    altitude_m: Optional[float] = None
 
 class StoredSensorData(SensorData):
     id: str = Field(default_factory=lambda: str(uuid4()))
