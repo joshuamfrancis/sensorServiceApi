@@ -166,4 +166,8 @@ def test_unauthorized(client):
 def test_health(client):
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json() == {"status": "ok"}
+    body = res.json()
+    assert body["status"] == "ok"
+    assert "server_datetime" in body
+    # verify it parses as a valid ISO 8601 datetime
+    datetime.fromisoformat(body["server_datetime"])
