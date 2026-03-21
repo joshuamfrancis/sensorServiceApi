@@ -1,0 +1,3 @@
+services:
+  sensor-service:
+    image: jfrancis/sensor-service:dev

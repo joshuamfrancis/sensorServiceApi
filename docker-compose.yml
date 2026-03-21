@@ -19,7 +19,7 @@ services:
       retries: 12
 
   sensor-service:
-    image: jfrancis/sensor-service
+    image: jfrancis/sensor-service:latest
     ports:
       - "8000:8000"
     environment:
