@@ -129,4 +129,4 @@ def get_device_values(
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "server_datetime": datetime.now(timezone.utc).isoformat()}
