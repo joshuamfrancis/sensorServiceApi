@@ -27,3 +27,6 @@ Thumbs.db
 
 # logs
 *.log
+
+# secrets
+.env

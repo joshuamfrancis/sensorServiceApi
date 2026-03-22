@@ -8,10 +8,11 @@ services:
     environment:
       DOCKER_INFLUXDB_INIT_MODE: setup
       DOCKER_INFLUXDB_INIT_USERNAME: admin
-      DOCKER_INFLUXDB_INIT_PASSWORD: adminpassword
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD}
       DOCKER_INFLUXDB_INIT_ORG: sensor_org
       DOCKER_INFLUXDB_INIT_BUCKET: sensor_data
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: my-super-secret-token
+      DOCKER_INFLUXDB_INIT_RETENTION: 336h
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
     healthcheck:
       test: ["CMD", "influx", "ping"]
       interval: 5s
@@ -24,10 +25,10 @@ services:
       - "8000:8000"
     environment:
       INFLUXDB_URL: http://influxdb:8086
-      INFLUXDB_TOKEN: my-super-secret-token
+      INFLUXDB_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
       INFLUXDB_ORG: sensor_org
       INFLUXDB_BUCKET: sensor_data
-      CLIENT_SECRET: mysecret
+      CLIENT_SECRET: ${CLIENT_SECRET}
     depends_on:
       influxdb:
         condition: service_healthy
