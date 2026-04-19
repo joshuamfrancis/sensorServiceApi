@@ -9,8 +9,8 @@ from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
 INFLUXDB_URL = os.getenv("INFLUXDB_URL", "http://localhost:8086")
-INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "my-super-secret-token")
-INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "sensor_org")
+INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "placeholder-secret-token")
+INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "placeholder_org")
 INFLUXDB_BUCKET = os.getenv("INFLUXDB_BUCKET", "sensor_data")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET", "mysecret")
 MEASUREMENT = "sensor_readings"
@@ -129,4 +129,4 @@ def get_device_values(
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "server_datetime": datetime.now(timezone.utc).isoformat()}
